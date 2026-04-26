@@ -1,50 +1,203 @@
-# DDR Report Generation Workflow
+# 🏗️ AI-Based DDR (Detailed Diagnostic Report) Generator
 
-This project builds a client-ready Detailed Diagnostic Report (DDR) from:
+## 📌 Overview
 
-- an inspection/sample report PDF
-- a thermal images/report PDF
+This project generates a **structured DDR (Detailed Diagnostic Report)** from:
 
-It extracts text and images from both documents, merges the findings with an LLM when an API key is available, and generates a structured HTML DDR that can be opened in a browser or printed to PDF.
+* 📄 Inspection Reports
+* 🌡️ Thermal Imaging Reports
 
-## Requirements
+The system extracts information from PDFs, processes it, and uses an LLM (Gemini) to produce a **clean, client-ready diagnostic report**.
 
-No Python or Node setup is required. The workflow runs with Windows PowerShell.
+---
 
-Optional:
+## 🚀 Key Features
 
-- `OPENAI_API_KEY` environment variable for AI-generated merging and reasoning
-- Poppler / `pdftotext` for best PDF text extraction. The script also checks the Git for Windows `pdftotext.exe` path when it is available.
+* 📑 **PDF Parsing**
 
-## Run
+  * Extracts text and images using PyMuPDF
 
-```powershell
-$env:OPENAI_API_KEY="your_api_key_here"
-powershell -ExecutionPolicy Bypass -File .\scripts\Generate-Ddr.ps1 `
-  -InspectionPdf .\data\sample_report.pdf `
-  -ThermalPdf .\data\thermal_images.pdf `
-  -OutputDir .\output
+* 🧠 **LLM-Based Reasoning**
+
+  * Uses Gemini (via LangChain) to analyze inspection + thermal data
+
+* 🧩 **Structured Output**
+
+  * Enforces schema using Pydantic
+  * Generates consistent DDR format
+
+* ⚠️ **Schema Correction Layer**
+
+  * Fixes incomplete/misaligned LLM outputs automatically
+
+* 🔁 **Retry Handling**
+
+  * Handles incomplete JSON responses from LLM
+
+* 🖼️ **Image Integration**
+
+  * Associates extracted images with observations
+
+* 🌐 **HTML Report Generation**
+
+  * Produces readable DDR report
+
+---
+
+## 🧠 System Architecture
+
+```
+Input PDFs
+   ↓
+PDF Parser (text + images)
+   ↓
+Text Structuring
+   ↓
+LLM Reasoning (Gemini)
+   ↓
+Schema Validation (Pydantic)
+   ↓
+Image Mapping
+   ↓
+HTML Report Output
 ```
 
-If `OPENAI_API_KEY` is not set, the script still extracts content and produces a draft DDR, but the AI reasoning/merging quality will be limited.
+---
 
-## Output
+## 🛠️ Tech Stack
 
-The script creates:
+* **Language:** Python
+* **PDF Processing:** PyMuPDF
+* **LLM:** Gemini (via LangChain)
+* **Validation:** Pydantic
+* **Environment Management:** python-dotenv
 
-- `output\ddr_report.html` - final report
-- `output\ddr_data.json` - structured data used to render the report
-- `output\assets\...` - extracted source images
+---
 
-## DDR Sections
+## 📁 Project Structure
 
-The generated report follows the assignment structure:
+```
+ai_ddr_system/
+│
+├── app/
+│   └── main.py
+│
+├── modules/
+│   ├── parser/
+│   ├── processor/
+│   ├── merger/
+│   ├── reasoning/
+│   ├── generator/
+│   ├── image_mapper/
+│   ├── output/
+│
+├── data/
+│   ├── input/
+│   ├── images/
+│   ├── output/
+│
+├── requirements.txt
+└── README.md
+```
 
-1. Property Issue Summary
-2. Area-wise Observations
-3. Probable Root Cause
-4. Severity Assessment with reasoning
-5. Recommended Actions
-6. Additional Notes
+---
 
-Relevant extracted images are placed under the related observation sections where possible.
+## ⚙️ Setup Instructions
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/your-username/ai-ddr-system.git
+cd ai-ddr-system
+```
+
+---
+
+### 2. Create virtual environment
+
+```bash
+python -m venv .venv
+.venv\Scripts\activate   # Windows
+```
+
+---
+
+### 3. Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+### 4. Add API Key
+
+Create a `.env` file in root:
+
+```
+GOOGLE_API_KEY=your_gemini_api_key
+```
+
+---
+
+### 5. Add input files
+
+Place PDFs in:
+
+```
+data/input/
+```
+
+Example:
+
+* `inspection.pdf`
+* `thermal.pdf`
+
+---
+
+### 6. Run the project
+
+```bash
+python -m app.main
+```
+
+---
+
+## 📄 Output
+
+After execution:
+
+```
+data/output/report.html
+```
+
+Open in browser to view the generated DDR.
+
+---
+
+## ⚠️ Known Limitations
+
+* Large input text may cause LLM truncation
+* Image mapping is basic (non-semantic)
+* Conflict detection is minimal
+* Output quality depends on LLM consistency
+
+---
+
+## 🔮 Future Improvements
+
+* Chunk-based processing (for large documents)
+* Advanced conflict detection logic
+* Semantic image-to-text mapping
+* Vector database integration (FAISS)
+* Multi-step reasoning pipeline
+
+---
+
+## 👨‍💻 Author
+
+**Khanakh Prajapati**
+B.Tech IT | AI/ML Enthusiast
+
+This project focuses on **system design + structured LLM reasoning**, not just API usage.
+It demonstrates how to build a **robust pipeline around unreliable LLM outputs**.
